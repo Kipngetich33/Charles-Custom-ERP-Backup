@@ -126,3 +126,234 @@ frappe.ui.form.on("Customer", {
 		if(frm.doc.lead_name) frappe.model.clear_doc("Lead", frm.doc.lead_name);
 	},
 });
+
+
+
+
+// customer added code
+
+var var_customername
+frappe.ui.form.on("Customer", {
+    onload: function(frm) {
+var_customername=frm.doc.customer_name;
+//frappe.call({
+
+           // "method": "frappe.client.get",
+            //args: {
+                //doctype: "Stock Entry Detail",
+               //filters: {t_warehouse: frm.doc.new_account_no}   
+            //},
+            //callback: function (r) {
+   //frm.set_value("meter_serial_no", r.message.item_code);
+
+frappe.call({
+            "method": "frappe.client.get_value",
+            args: {
+                doctype: "Item",
+               filters: {"item_code":r.message.item_code}   
+            },
+            callback: function (datas) {
+  frm.set_value("meter_serial_no", r.message.item_code);
+  frm.set_value("meter_size", datas.message.item_group);
+  frm.set_value("initial_reading", datas.message.initial_reading);
+//}
+//})
+
+
+}
+});
+
+frappe.call({
+            "method": "frappe.client.get_value",
+            args: {
+                doctype: "Item",
+ fieldname: 'item_group',
+                filters: { item_code: frm.doc.meter_serial_no },
+
+            },
+            callback: function (r) {
+
+   frm.set_value("meter_size", r.message.item_group);
+}
+});
+frappe.call({
+            "method": "frappe.client.get_value",
+            args: {
+                doctype: "Item",
+ fieldname: 'initial_reading',
+                filters: { item_code: frm.doc.meter_serial_no },
+            },
+            callback: function (r) {
+   frm.set_value("initial_reading", r.message.initial_reading);
+}
+});
+
+}
+});
+
+frappe.ui.form.on("Customer", "new_project", function(frm) {
+		frappe.route_options = {"customer": var_customername,"project_name":var_customername+' '+'Connection'}
+ 		frappe.set_route("Form", "Project","New Project 1")
+});
+
+
+frappe.ui.form.on("Customer", "create_customer_meter_warehouse", function(frm) {
+frappe.route_options = {"customer_name": var_customername}
+frappe.set_route("Form", "Warehouse", "New Warehouse 1")
+}
+);
+
+frappe.ui.form.on("Customer", "make_deposit_invoice", function(frm) {
+frappe.route_options = {"customer": var_customername,"type_of_invoice":"Deposit"}
+frappe.set_route("Form", "Sales Invoice","New Sales Invoice 1")
+
+}
+);
+
+frappe.ui.form.on("Customer", "make_new_connection_fees_invoice", function(frm) {
+frappe.route_options = {"customer": var_customername,"type_of_invoice":"New Connection Fee"}
+frappe.set_route("Form", "Sales Invoice","New Sales Invoice 1")
+}
+);
+
+frappe.ui.form.on("Customer", "new_account_no", function(frm){ 
+cur_frm.clear_table("accounts"); 
+cur_frm.grids[0].grid.add_new_row(null,null,false);
+    var newrow = cur_frm.grids[0].grid.grid_rows[cur_frm.grids[0].grid.grid_rows.length - 1].doc;
+newrow.account=cur_frm.doc.new_account_no;
+cur_frm.refresh_field("accounts") 
+});
+
+frappe.ui.form.on("Customer", {
+    onload: function (frm) {
+cur_frm.clear_table("accounts"); 
+cur_frm.grids[0].grid.add_new_row(null,null,false);
+    var newrow = cur_frm.grids[0].grid.grid_rows[cur_frm.grids[0].grid.grid_rows.length - 1].doc;
+newrow.account=cur_frm.doc.new_account_no;
+cur_frm.refresh_field("accounts") 
+    },
+});
+
+frappe.ui.form.on('Customer', {
+    refresh: function(frm) {
+ frm.add_custom_button(__('Activate'), function(){
+frappe.set_route("Form", "Customer", frm.doc.customer_name);
+frm.set_value("status", "Active")
+cur_frm.save();
+ },__("Activate/Inactivate")); 
+   frm.add_custom_button(__('Inactivate'), function(){
+frappe.set_route("Form", "Customer", frm.doc.customer_name);
+frm.set_value("status", "Inactive")
+cur_frm.save();
+ }, __("Activate/Inactivate"));
+frm.add_custom_button(__('Disconnect'), function(){
+frappe.set_route('query-report', 'Accounts Receivable', {customer:frm.doc.name});
+			});
+ //frappe.set_route("Form", "Customer", frm.doc.customer_name);
+//frm.set_value("status", "Disconnected")
+//cur_frm.save();       
+   // },);
+frm.add_custom_button(__('Reconnect'), function(){
+frappe.set_route("Form", "Customer", frm.doc.customer_name);
+frm.set_value("status", "Reconnected")
+cur_frm.save();       
+    },);
+      frm.add_custom_button(__('Terminate'), function(){
+       frappe.set_route("Form", "Customer", frm.doc.customer_name);
+frm.set_value("status", "Terminated")
+frm.set_df_property("status", "read_only", frm.doc.__islocal ? 0 : 1);
+frm.set_df_property("customer_name", "read_only", frm.doc.__islocal ? 0 : 1);
+cur_frm.save();
+    },); 
+ frm.add_custom_button(__('Supercede'), function(){
+frm.copy_doc();
+    },);
+frm.add_custom_button(__('Account Balance'), function(){
+frappe.set_route("Form","Customer","frm.doc.customer_name", frm.doc.outsatanding_balances);
+  },);
+  }
+});
+cur_frm.add_fetch('deposit','standard_rate','deposit_amount')
+cur_frm.add_fetch('meter_serial_no','item_group','meter_size')
+
+frappe.ui.form.on('Customer', {
+	territory: function(frm) {
+		frm.add_fetch("parent_land_unit", "latitude", "latitude");
+		frm.add_fetch("parent_land_unit", "longitude", "longitude");
+		frm.set_query("parent_land_unit", function() {
+			return {
+				"filters": {
+					"is_group": 1
+				}
+			};
+		});
+	},
+
+	onload_post_render(frm){
+		if(!frm.doc.location && frm.doc.latitude && frm.doc.longitude)	{
+			frm.fields_dict.location.map.setView([frm.doc.latitude, frm.doc.longitude],13);
+		}
+		else {
+			frm.doc.latitude = frm.fields_dict.location.map.getCenter()['lat'];
+			frm.doc.longitude = frm.fields_dict.location.map.getCenter()['lng'];
+		}
+	},
+});
+
+
+
+frappe.ui.form.on("Customer", "refresh", function(frm) {
+cur_frm.set_query("territory", function() {
+    return {
+        
+    	filters: [
+         
+		["Territory", "parent_territory", "=", "All Territories" ],
+            ],
+
+    }
+});
+
+});
+
+frappe.ui.form.on("Customer", "refresh", function(frm) {
+cur_frm.set_query("area", function() {
+    return {
+     
+    	filters: [
+                //["Territory", "!=", "Is Group=1" ],
+		["Territory", "parent_territory", "=", frm.doc.territory],
+            ],
+
+    }
+});
+
+});
+
+frappe.ui.form.on("Customer", "refresh", function(frm) {
+cur_frm.set_query("zone", function() {
+    return {
+     
+    	filters: [
+                //["Territory", "!=", "Is Group=1" ],
+		["Territory", "parent_territory", "=", frm.doc.area],
+            ],
+
+    }
+});
+
+});
+
+frappe.ui.form.on("Customer", "refresh", function(frm) {
+cur_frm.set_query("route", function() {
+    return {
+     
+    	filters: [
+                //["Territory", "!=", "Is Group=1" ],
+		["Territory", "parent_territory", "=", frm.doc.zone],
+            ],
+
+    }
+});
+
+});
