@@ -1,6 +1,5 @@
 {
  "allow_copy": 0, 
- "allow_events_in_timeline": 0, 
  "allow_guest_to_view": 0, 
  "allow_import": 1, 
  "allow_rename": 0, 
@@ -1976,7 +1975,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2018-10-11 11:52:39.047935", 
+ "modified": "2018-07-15 11:09:19.425998", 
  "modified_by": "Administrator", 
  "module": "Manufacturing", 
  "name": "BOM", 
