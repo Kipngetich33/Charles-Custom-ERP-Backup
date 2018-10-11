@@ -131,10 +131,10 @@ frappe.ui.form.on("Customer", {
 	},
 });
 
+// this is some js test
 
-
-
-// customer added code
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// custom scripts below
 
 var var_customername
 frappe.ui.form.on("Customer", {
@@ -171,7 +171,7 @@ frappe.call({
             "method": "frappe.client.get_value",
             args: {
                 doctype: "Item",
- fieldname: 'item_group',
+ 			fieldname: 'item_group',
                 filters: { item_code: frm.doc.meter_serial_no },
 
             },
@@ -180,6 +180,8 @@ frappe.call({
    frm.set_value("meter_size", r.message.item_group);
 }
 });
+
+
 frappe.call({
             "method": "frappe.client.get_value",
             args: {
@@ -195,9 +197,12 @@ frappe.call({
 }
 });
 
+
 frappe.ui.form.on("Customer", "new_project", function(frm) {
-		frappe.route_options = {"customer": var_customername,"project_name":var_customername+' '+'Connection'}
- 		frappe.set_route("Form", "Project","New Project 1")
+	/* this code fetches the customer name and the project name and 
+	creates a new project using those details*/
+	frappe.route_options = {"customer": var_customername,"project_name":var_customername +' '+'Connection'}
+	frappe.set_route("Form", "Project","New Project 1")
 });
 
 
@@ -234,9 +239,10 @@ cur_frm.clear_table("accounts");
 cur_frm.grids[0].grid.add_new_row(null,null,false);
     var newrow = cur_frm.grids[0].grid.grid_rows[cur_frm.grids[0].grid.grid_rows.length - 1].doc;
 newrow.account=cur_frm.doc.new_account_no;
-cur_frm.refresh_field("accounts") 
+cur_frm.refresh_field("accounts")
     },
 });
+
 
 frappe.ui.form.on('Customer', {
     refresh: function(frm) {
@@ -305,60 +311,40 @@ frappe.ui.form.on('Customer', {
 });
 
 
-
+/*Functionality that sets the value of form query 'route' 
+to show only routes*/
 frappe.ui.form.on("Customer", "refresh", function(frm) {
-cur_frm.set_query("territory", function() {
-    return {
-        
-    	filters: [
-         
-		["Territory", "parent_territory", "=", "All Territories" ],
-            ],
 
-    }
+	// sets the value of the country/territory query field
+	cur_frm.set_query("territory", function() {
+		return {
+			"filters": {
+				"type": "Country"
+			}
+		}
+	});
+
+	cur_frm.set_query("area", function() {
+		return {
+			"filters": {
+				"type": "Area"
+			}
+		}
+	});
+
+	cur_frm.set_query("zone", function() {
+		return {
+			"filters": {
+				"type": "Zone"
+			}
+		}
+	});
+
+    cur_frm.set_query("route", function() {
+        return {
+            "filters": {
+				"type": "Route"
+            }
+		};
+    });
 });
-
-});
-
-frappe.ui.form.on("Customer", "refresh", function(frm) {
-cur_frm.set_query("area", function() {
-    return {
-     
-    	filters: [
-                //["Territory", "!=", "Is Group=1" ],
-		["Territory", "parent_territory", "=", frm.doc.territory],
-            ],
-
-    }
-});
-
-});
-
-frappe.ui.form.on("Customer", "refresh", function(frm) {
-cur_frm.set_query("zone", function() {
-    return {
-     
-    	filters: [
-                //["Territory", "!=", "Is Group=1" ],
-		["Territory", "parent_territory", "=", frm.doc.area],
-            ],
-
-    }
-});
-
-});
-
-frappe.ui.form.on("Customer", "refresh", function(frm) {
-cur_frm.set_query("route", function() {
-    return {
-     
-    	filters: [
-                //["Territory", "!=", "Is Group=1" ],
-		["Territory", "parent_territory", "=", frm.doc.zone],
-            ],
-
-    }
-});
-
-});
-// this is some js test
