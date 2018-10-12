@@ -310,44 +310,73 @@ enquiries*/
 // 	},
 // });
 
+/*general functions section*/
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-// test function
-function set_country(){
-	cur_frm.set_query("territory", function() {
+// function that sets filters for the different territory fields
+function set_country(territory_field,type_of_territory){
+	cur_frm.set_query(territory_field, function() {
 		return {
 			"filters": {
-				"type_of_territory": "Country"
+				"type_of_territory": type_of_territory
 			}
 		}
 	});
 }
 
+// function that sets custom buttons for the customer
+function add_custom_buttons(button_name,new_status){
+	cur_frm.add_custom_button(__(button_name), function(){
+		
+		if(new_status == "supercede"){
+			cur_frm.copy_doc()
+		}
+		else{
+			cur_frm.set_value("status", new_status)
+			cur_frm.save();
+		}
+	},__("Customer Management Menu"));
+}
+
+// function that sets filters for the different territory fields
+function filter_field(field,filter_name){
+	cur_frm.set_query(field, function() {
+		return {
+			"filters": {
+				parent_warehouse: filter_name
+			}
+		}
+	});
+}
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+/*end of the general functions section*/
+
+
+/*section below contains field triggered functions*/
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /*Functionality that sets the value of form query 'route' 
 to show only routes*/
 frappe.ui.form.on("Customer", "refresh", function(frm) {
 	// sets the value of the country/territory query field
+	set_country("territory","Country")
+	set_country("area","Area")
+	set_country("zone","Zone")
+	set_country("route","Route")
+	// end of set territory field details
 
-	cur_frm.set_query("area", function() {
-		return {
-			"filters": {
-				"type_of_territory": "Area"
-			}
-		}
-	});
+	// add custom buttons
+	add_custom_buttons("Activate","Active")
+	add_custom_buttons("Inactivate","Inactive")
+	add_custom_buttons("Reconnect","Reconnected")
+	add_custom_buttons("Disconnect","Disconnected")
+	add_custom_buttons("Terminate","Terminated")
+	add_custom_buttons("Supercede","supercede")
 
-	cur_frm.set_query("zone", function() {
-		return {
-			"filters": {
-				"type_of_territory": "Zone"
-			}
-		}
-	});
-
-    cur_frm.set_query("route", function() {
-        return {
-            "filters": {
-				"type_of_territory": "Route"
-            }
-		};
-    });
+	// filter dma by warehouse dma
+	filter_field("dma","DMA Bulk Meter - UL")
+	
 });
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+/*End of the field triggered functions*/
