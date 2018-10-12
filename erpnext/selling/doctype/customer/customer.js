@@ -317,7 +317,9 @@ frappe.ui.form.on("Customer", "refresh", function(frm) {
 	frappe.call({
 		method: 'frappe.client.get_list',
 		args: {
-			"address_dict": frm.doc.customer_primary_address
+			doctype:"Territory",
+			filters: {type : "Country"}
+
 		},
 		callback: function(response) {
 			console.log(response)
