@@ -135,7 +135,6 @@ frappe.ui.form.on("Customer", {
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 // custom scripts below
-
 var var_customername
 frappe.ui.form.on("Customer", {
     onload: function(frm) {
@@ -315,6 +314,21 @@ frappe.ui.form.on('Customer', {
 /*Functionality that sets the value of form query 'route' 
 to show only routes*/
 frappe.ui.form.on("Customer", "refresh", function(frm) {
+
+	frappe.call({
+		method: 'frappe.client.get_list',
+		args: {
+			"address_dict": frm.doc.customer_primary_address
+		},
+		callback: function(response) {
+			console.log(response)
+		}
+	});
+	// if(!frm.doc.customer_primary_contact){
+	// 	frm.set_value("mobile_no", "");
+	// 	frm.set_value("email_id", "");
+	// }
+	
 
 	// sets the value of the country/territory query field
 	cur_frm.set_query("territory", function() {
