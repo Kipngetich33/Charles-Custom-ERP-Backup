@@ -145,3 +145,41 @@ frappe.ui.form.on("Project", "validate", function (frm) {
 		});
 	}
 });
+
+
+/*the code below are custom codes*/
+
+// this is the general function section
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+// this is the end of general function section
+
+
+/*this is the function triggered section*/
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+frappe.ui.form.on("Project", "refresh", function(frm) {
+	
+	if(cur_frm.doc.system_no){
+		var current_system_no = cur_frm.doc.system_no
+		// get the customer from 
+		frappe.call({
+			method: "frappe.client.get",
+			args: {
+				doctype:"Customer",
+				filters:{"system_no":cur_frm.doc.system_no}
+			},
+			callback: function(response) {
+				frm.set_value("project_name",response.message.customer_name)
+			}
+		})
+		
+	}
+	else{
+		// do nothing since the field does not exist
+	}
+})
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+/*end of the function triggered function*/
