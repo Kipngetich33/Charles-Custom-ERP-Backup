@@ -198,13 +198,6 @@ enquiries*/
 // });
 
 
-// frappe.ui.form.on("Customer", "new_project", function(frm) {
-// 	/* this code fetches the customer name and the project name and 
-// 	creates a new project using those details*/
-// 	frappe.route_options = {"customer": var_customername,"project_name":var_customername +' '+'Connection'}
-// 	frappe.set_route("Form", "Project","New Project 1")
-// });
-
 
 // frappe.ui.form.on("Customer", "create_customer_meter_warehouse", function(frm) {
 // frappe.route_options = {"customer_name": var_customername}
@@ -312,6 +305,10 @@ enquiries*/
 
 /*general functions section*/
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+// global variables
+var latest_customer_sys_no = 0
+
+// end of global varibles section
 
 // function that sets filters for the different territory fields
 function set_country(territory_field,type_of_territory){
@@ -348,6 +345,30 @@ function filter_field(field,filter_name){
 		}
 	});
 }
+/*frappe call function that gets a docytype without filters*/
+function get_doctype_without_filters(requested_doctype){
+	frappe.call({
+		method: 'frappe.client.get',
+		args: {
+			doctype:requested_doctype,
+		},
+		callback: function(response) {
+			return response
+		}
+	});
+
+}
+
+/*functions that checks whether a customer number exists*/
+function if_system_number(){
+	if(cur_frm.doc.system_no){
+		return true
+	}
+	else{
+		return false
+	} 
+}
+
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /*end of the general functions section*/
@@ -358,6 +379,25 @@ function filter_field(field,filter_name){
 /*Functionality that sets the value of form query 'route' 
 to show only routes*/
 frappe.ui.form.on("Customer", "refresh", function(frm) {
+	// check or set system no
+	frappe.call({
+		method: 'frappe.client.get',
+		args: {
+			doctype:"Customer System Number",
+		},
+		callback: function(response) {
+			if(if_system_number()){
+				latest_customer_sys_no = frm.doc.system_no
+			}
+			else{
+				cur_frm.set_value("system_no",response.message.customer_number +1)	
+				latest_customer_sys_no = response.message.customer_number	
+			}
+			
+		}
+	});
+	// end of check or set system number
+
 	// sets the value of the country/territory query field
 	set_country("territory","Country")
 	set_country("area","Area")
@@ -377,6 +417,38 @@ frappe.ui.form.on("Customer", "refresh", function(frm) {
 	filter_field("dma","DMA Bulk Meter - UL")
 	
 });
+
+
+/* this code fetches the customer name and the project name and 
+creates a new project using those details*/
+frappe.ui.form.on("Customer", "new_project", function(frm) {
+	cur_frm.save()
+	if(cur_frm.doc.status == "Pending Application"){
+		frappe.route_options = {"system_no":cur_frm.doc.system_no,"customer":cur_frm.doc.customer_name}
+		frappe.set_route("Form", "Project","New Project 1")
+	}
+});
+
+
+/*after save fucntion */
+frappe.ui.form.on("Customer",{
+	after_save:function(){
+		if(parseInt(cur_frm.doc.system_no) <= parseInt(latest_customer_sys_no)){
+			// do nothing number exists
+		}
+		else{
+			frappe.call({
+				"method": "frappe.client.set_value",
+				"args": {
+					"doctype": "Customer System Number",
+					"name": "customer_number",
+					"fieldname": "customer_number",
+					"value": parseInt(cur_frm.doc.system_no)
+				}
+			});
+		}
+	}
+})
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /*End of the field triggered functions*/
