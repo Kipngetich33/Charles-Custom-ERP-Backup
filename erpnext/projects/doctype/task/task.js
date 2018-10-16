@@ -104,3 +104,6 @@ frappe.ui.form.on("Task", {
 
 cur_frm.add_fetch('task', 'subject', 'subject');
 cur_frm.add_fetch('task', 'project', 'project');
+
+
+/*the code below are custom scripts*/

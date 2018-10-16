@@ -159,8 +159,9 @@ frappe.ui.form.on("Project", "validate", function (frm) {
 
 /*this is the function triggered section*/
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 frappe.ui.form.on("Project", "refresh", function(frm) {
-	
+
 	if(cur_frm.doc.system_no){
 		var current_system_no = cur_frm.doc.system_no
 		// get the customer from 
@@ -172,14 +173,21 @@ frappe.ui.form.on("Project", "refresh", function(frm) {
 			},
 			callback: function(response) {
 				frm.set_value("project_name",response.message.customer_name)
+				frm.set_value("project_type","External")
+				frm.set_value("department","All Departments")
+
 			}
 		})
-		
 	}
 	else{
 		// do nothing since the field does not exist
 	}
+
+	// adding tasks
+	
 })
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /*end of the function triggered function*/
+
+
