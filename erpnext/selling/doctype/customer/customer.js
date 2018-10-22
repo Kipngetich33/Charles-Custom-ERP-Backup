@@ -310,6 +310,45 @@ var latest_customer_sys_no = 0
 
 // end of global varibles section
 
+// function creates a new project
+function create_new_project(){
+	if(cur_frm.doc.status == "Pending Application"){
+		console.log("form data")
+		console.log(cur_frm.doc.system_no)
+		frappe.route_options = {"system_no":cur_frm.doc.system_no,"customer":cur_frm.doc.customer_name}
+		frappe.set_route("Form", "Project","New Project 1")
+		
+	}
+	else{
+		alert_message("Cannot Create Project for a Customer whose Status is not Pending")
+	}
+
+} 
+
+// function that supercedes the doctype
+function supercede_function(){
+	cur_frm.copy_doc()
+}
+
+// function that creates an alert message
+function alert_message(message_to_print){
+	msgprint(message_to_print)
+}
+
+// alert function
+function alert_new_project(alert_message){
+	frappe.confirm(
+		alert_message,
+		function(){
+			// create a new project
+			frappe.route_options = {"system_no":cur_frm.doc.system_no,"customer":cur_frm.doc.customer_name}
+			frappe.set_route("Form", "Project","New Project 1")
+		}
+	)
+
+}
+
+
 // function that sets filters for the different territory fields
 function set_country(territory_field,type_of_territory){
 	cur_frm.set_query(territory_field, function() {
@@ -325,8 +364,16 @@ function set_country(territory_field,type_of_territory){
 function add_custom_buttons(button_name,new_status){
 	cur_frm.add_custom_button(__(button_name), function(){
 		
-		if(new_status == "supercede"){
-			cur_frm.copy_doc()
+		if(new_status == "Supercede"){
+			console.log("super seeed")
+			if(cur_frm.doc.status == "Terminated" || cur_frm.doc.status == "Inactive"){
+				alert_function("Do you want to supercede this account",supercede_function)
+				
+			}
+			else{
+				// alert the user that the account cannot be superseded
+				alert_message("You Cannot Supercede This Account")
+			}
 		}
 		else{
 			cur_frm.set_value("status", new_status)
@@ -411,7 +458,7 @@ frappe.ui.form.on("Customer", "refresh", function(frm) {
 	add_custom_buttons("Reconnect","Reconnected")
 	add_custom_buttons("Disconnect","Disconnected")
 	add_custom_buttons("Terminate","Terminated")
-	add_custom_buttons("Supercede","supercede")
+	add_custom_buttons("Supercede","Supercede")
 
 	// filter dma by warehouse dma
 	filter_field("dma","DMA Bulk Meter - UL")
@@ -422,10 +469,12 @@ frappe.ui.form.on("Customer", "refresh", function(frm) {
 /* this code fetches the customer name and the project name and 
 creates a new project using those details*/
 frappe.ui.form.on("Customer", "new_project", function(frm) {
-	cur_frm.save()
 	if(cur_frm.doc.status == "Pending Application"){
-		frappe.route_options = {"system_no":cur_frm.doc.system_no,"customer":cur_frm.doc.customer_name}
-		frappe.set_route("Form", "Project","New Project 1")
+		cur_frm.save()
+		alert_new_project("Create New Project")
+	}
+	else{
+		alert_message("Cannot Create Project for a Customer whose Status is not Pending")
 	}
 });
 
@@ -448,6 +497,18 @@ frappe.ui.form.on("Customer",{
 			});
 		}
 	}
-})
+});
+
+/*save function */
+frappe.ui.form.on("Customer", "create_application", function(frm) {
+	if(cur_frm.doc.status == "Pending Application"){
+		cur_frm.save()
+		alert_new_project("Create New Project")
+	}
+	else{
+		alert_message("Cannot Create Project for a Customer whose Status is not Pending")
+	}
+	
+});
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /*End of the field triggered functions*/

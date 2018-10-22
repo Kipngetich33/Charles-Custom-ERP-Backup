@@ -152,6 +152,19 @@ frappe.ui.form.on("Project", "validate", function (frm) {
 // this is the general function section
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+// global variable
+var list_of_tasks = ["Survey","Account Registration","Issue Meter","Meter Connection","Account Activation"]
+
+
+function add_tasks(){
+	// adding tasks
+	for(var i=0;i< list_of_tasks.length;i++){
+		var new_row = cur_frm.add_child("tasks");
+		cur_frm.doc.tasks[i].title= list_of_tasks[i]
+
+	}
+	cur_frm.refresh_field("tasks")
+}
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 // this is the end of general function section
@@ -176,15 +189,16 @@ frappe.ui.form.on("Project", "refresh", function(frm) {
 				frm.set_value("project_type","External")
 				frm.set_value("department","All Departments")
 
+				// adding tasks
+				add_tasks()
+
+
 			}
 		})
 	}
 	else{
 		// do nothing since the field does not exist
 	}
-
-	// adding tasks
-	
 })
 
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
