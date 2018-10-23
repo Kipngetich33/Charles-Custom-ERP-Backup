@@ -416,7 +416,6 @@ function if_system_number(){
 	} 
 }
 
-
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 /*end of the general functions section*/
 
