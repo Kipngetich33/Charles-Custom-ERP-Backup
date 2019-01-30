@@ -153,14 +153,14 @@ frappe.ui.form.on("Project", "validate", function (frm) {
 // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 // global variable
-var list_of_tasks = ["Survey","Account Registration","Issue Meter","Meter Connection","Account Activation"]
+var list_of_tasks = ["Survey","Account Registration","Meter Connection","Account Activation"]
 
 
 function add_tasks(){
 	// adding tasks
 	for(var i=0;i< list_of_tasks.length;i++){
-		var new_row = cur_frm.add_child("tasks");
-		cur_frm.doc.tasks[i].title= list_of_tasks[i]
+		var new_row = frm.add_child("tasks");
+		frm.doc.tasks[i].title= list_of_tasks[i]
 
 	}
 	cur_frm.refresh_field("tasks")
@@ -189,10 +189,14 @@ frappe.ui.form.on("Project", "refresh", function(frm) {
 				frm.set_value("project_type","External")
 				frm.set_value("department","All Departments")
 
-				// adding tasks
-				add_tasks()
-
-
+				// addiing tasks
+				// add_tasks()
+				for(var i=0;i< list_of_tasks.length;i++){
+					var new_row = frm.add_child("tasks");
+					frm.doc.tasks[i].title= list_of_tasks[i]
+				}
+				cur_frm.refresh_field("tasks")
+				
 			}
 		})
 	}
